@@ -1,0 +1,30 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+
+# Persons
+person_list:
+  path: /persons
+  methods: [GET]
+  controller: App\Controller\PersonController::index
+
+single_person:
+  path: /persons/{id}
+  methods: [GET]
+  controller: App\Controller\PersonController::show
+
+create_person:
+  path: /persons
+  methods: [POST]
+  controller: App\Controller\PersonController::save
+
+update_person:
+  path: /persons/{id}
+  methods: [PUT]
+  controller: App\Controller\PersonController::update
+
+delete_person:
+  path: /persons/{id}
+  methods: [DELETE]
+  controller: App\Controller\PersonController::delete
