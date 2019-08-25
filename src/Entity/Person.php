@@ -34,29 +34,6 @@ class Person
      */
     private $email;
 
-//    /**
-//     * @ORM\ManyToOne(targetEntity="App\Entity\Phone", inversedBy="phones")
-//     * @ORM\JoinColumn(name="id", referencedColumnName="person_id", nullable=false)
-//     */
-//    private $phones;
-//
-//    public function __construct()
-//    {
-//        $this->phones = new ArrayCollection();
-//    }
-//
-//    public function getPhones(): ?Phone
-//    {
-//        return $this->phones;
-//    }
-//
-//
-//    public function setPhones(?Phone $phone): self
-//    {
-//        $this->phones = $phone;
-//        return $this;
-//    }
-
     // Getters and setters
 
     public function getId()

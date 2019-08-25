@@ -77,7 +77,6 @@ class PersonController extends AbstractController
     public function update(Request $request, $id)
     {
         $data = json_decode($request->getContent(), true);
-
         $entityManager = $this->getDoctrine()->getManager();
 
         $person = $entityManager->getRepository(Person::class)->find($id);
@@ -91,24 +90,21 @@ class PersonController extends AbstractController
         $person->setLastName($data['last_name']);
         $entityManager->flush();
 
-
         $conn = $this->getDoctrine()->getConnection();
 
-        $sql = "SELECT * FROM phone WHERE person_id = " . $person->getId();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $existingNumbers = $stmt->fetchAll();
-        $numbersArray = [];
-        foreach ($existingNumbers as $number) {
-            $numbersArray[] = $number['number'];
+        $existingPhoneNumbers = $this->getPersonExistingNumbers($person->getId());
+        $newPhoneNumbers = $data['phone'];
+
+        $phoneNumbersForDelete = array_diff($existingPhoneNumbers, $newPhoneNumbers);
+        $phoneNumbersForCreate = array_diff($newPhoneNumbers, $existingPhoneNumbers);
+
+        foreach ($phoneNumbersForDelete as $item) {
+            $sql2 = "DELETE FROM phone WHERE number = " . $item;
+            $stmt = $conn->prepare($sql2);
+            $stmt->execute();
         }
 
-
-        $sql2 = "DELETE FROM phone WHERE person_id = " . $person->getId();
-        $stmt = $conn->prepare($sql2);
-        $stmt->execute();
-
-        foreach ($data['phone'] as $phone) {
+        foreach ($phoneNumbersForCreate as $phone) {
             $phone_number = new Phone();
             $phone_number->setPersonId($person->getId());
             $phone_number->setNumber($phone);
@@ -121,8 +117,27 @@ class PersonController extends AbstractController
         $stmt->execute();
         $newNumbers = $stmt->fetchAll();
 
-
         return $this->json(['person' => $person, "numbers" => $newNumbers], 201);
+    }
+
+    /**
+     * Endpoint for getting person existing phone numbers from DB.
+     * @param $person_id
+     * @return array
+     */
+    private function getPersonExistingNumbers($person_id)
+    {
+        $conn = $this->getDoctrine()->getConnection();
+
+        $sql = "SELECT * FROM phone WHERE person_id = " . $person_id;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $existingNumbers = $stmt->fetchAll();
+        $numbersArray = [];
+        foreach ($existingNumbers as $number) {
+            $numbersArray[] = $number['number'];
+        }
+        return $numbersArray;
     }
 
     /**
