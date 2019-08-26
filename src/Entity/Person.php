@@ -34,11 +34,27 @@ class Person
      */
     private $email;
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="person")
+     */
+    private $phones;
+
+    public function __construct()
+    {
+        $this->phones= new ArrayCollection();
+    }
+
+
     // Getters and setters
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getPhoneNumbers(){
+        return $this->phones;
     }
 
     public function getFirstName()

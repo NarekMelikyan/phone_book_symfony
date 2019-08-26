@@ -29,6 +29,12 @@ class Phone
      */
     private $number;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Person", inversedBy="phones", cascade={"remove"})
+     * @ORM\JoinColumn(name="person_id", referencedColumnName="id")
+     */
+    protected $person;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -42,7 +48,6 @@ class Phone
     public function setNumber(int $number): self
     {
         $this->number = $number;
-
         return $this;
     }
 
@@ -54,7 +59,16 @@ class Phone
     public function setPersonId(int $person_id): self
     {
         $this->person_id = $person_id;
+        return $this;
+    }
+//    public function getPerson()
+//    {
+//        return $this->person;
+//    }
 
+    public function setPerson($person): self
+    {
+        $this->person = $person;
         return $this;
     }
 }
