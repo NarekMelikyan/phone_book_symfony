@@ -139,10 +139,12 @@ class PersonController extends AbstractController
         $phoneNumbersForDelete = array_diff($existingPhoneNumbers, $newPhoneNumbers);
         $phoneNumbersForCreate = array_diff($newPhoneNumbers, $existingPhoneNumbers);
 
+        $conn = $this->getDoctrine()->getConnection();
+
         foreach ($phoneNumbersForDelete as $item) {
-            $phoneNumber = $entityManager->getRepository(Phone::class)->findBy(['number' => $item])[0];
-            $entityManager->remove($phoneNumber);
-            $entityManager->flush();
+            $sql = 'DELETE FROM phone WHERE number = '.$item;
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
         }
 
         foreach ($phoneNumbersForCreate as $phone) {
@@ -166,15 +168,10 @@ class PersonController extends AbstractController
      */
     private function getPersonExistingNumbers($person_id)
     {
-        $conn = $this->getDoctrine()->getConnection();
-
-        $sql = "SELECT * FROM phone WHERE person_id = " . $person_id;
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $existingNumbers = $stmt->fetchAll();
+        $existingNumbers = $this->getDoctrine()->getRepository(Phone::class)->findBy(['person_id' => $person_id]);
         $numbersArray = [];
         foreach ($existingNumbers as $number) {
-            $numbersArray[] = $number['number'];
+            $numbersArray[] = $number->getNumber();
         }
         return $numbersArray;
     }
@@ -194,7 +191,7 @@ class PersonController extends AbstractController
         }
 
         $phoneNumbers = $entityManager->getRepository(Phone::class)->findBy(['person_id' => $id]);
-        foreach ($phoneNumbers as $item){
+        foreach ($phoneNumbers as $item) {
             $itemPhone = $entityManager->getRepository(Phone::class)->find($item->getId());
             $entityManager->remove($itemPhone);
             $entityManager->flush();
